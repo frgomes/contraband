@@ -10,10 +10,10 @@ lazy val root = (project in file(".")).
   aggregate(library, plugin).
   settings(
     inThisBuild(List(
-      version := "0.3.0-SNAPSHOT",
+      version := "0.3.0-M4",
       organization := "org.scala-sbt",
       crossScalaVersions := Seq("2.12.1", "2.11.8", "2.10.6"),
-      scalaVersion := "2.10.6",
+      scalaVersion := "2.12.1",
       organizationName := "sbt",
       organizationHomepage := Some(url("http://scala-sbt.org/")),
       homepage := Some(url("http://scala-sbt.org/contraband")),
@@ -46,10 +46,14 @@ lazy val plugin = (project in file("plugin")).
     pluginSettings,
     name := "sbt-contraband",
     description := "sbt plugin to generate growable datatypes.",
-    ScriptedPlugin.scriptedSettings,
-    scriptedLaunchOpts := { scriptedLaunchOpts.value ++
-      Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
-    },
-    publishLocal := (publishLocal dependsOn (publishLocal in library)).value
+    // ScriptedPlugin.scriptedSettings,
+    // scriptedLaunchOpts := { scriptedLaunchOpts.value ++
+    //   Seq("-Xmx1024M", "-XX:MaxPermSize=256M", "-Dplugin.version=" + version.value)
+    // },
+    publishLocal := (publishLocal dependsOn (publishLocal in library)).value,
+    sbtVersion in Global := "1.0.0-M4-LOCAL-20170415B",
+    scalaCompilerBridgeSource := {
+      ("org.scala-sbt" % "compiler-interface" % "0.13.15" % "component").sources
+    }
   ).
   dependsOn(library)

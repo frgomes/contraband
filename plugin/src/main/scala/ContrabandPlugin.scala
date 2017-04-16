@@ -5,6 +5,10 @@ import Keys._
 import ast._
 import parser.{ JsonParser, SchemaParser }
 import scala.util.Success
+import sjsonnew.IsoString
+import sjsonnew.support.scalajson.unsafe.{ CompactPrinter, Converter, Parser }
+import sbt.internal.util.DirectoryStoreFactory
+import scala.json.ast.unsafe.JValue
 
 object ContrabandPlugin extends AutoPlugin {
 
@@ -108,6 +112,8 @@ object ContrabandPlugin extends AutoPlugin {
 }
 
 object Generate {
+  implicit val jvalueIsoString: IsoString[JValue] = IsoString.iso(CompactPrinter.apply, Parser.parseUnsafe)
+
   private def generate(createDatatypes: Boolean,
     createCodecs: Boolean,
     definitions: Array[File],
@@ -198,7 +204,9 @@ object Generate {
     def gen() = generate(createDatatypes, createCodecs, definitions, target, javaLazy, javaOption, scalaArray,
       scalaFileNames, scalaSealInterface, scalaPrivateConstructor, wrapOption,
       codecParents, instantiateJavaLazy, instantiateJavaOptional, formatsForType, s.log)
-    val f = FileFunction.cached(s.cacheDirectory / "gen-api", FilesInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
+    import sbt.internal.util.CacheImplicits._
+    val store = new DirectoryStoreFactory[JValue](s.cacheDirectory / "gen-api", Converter)
+    val f = FileFunction.cached(store, FileInfo.hash) { _ => gen().toSet } // TODO: check if output directory changed
     f(definitions.toSet).toSeq
   }
 }

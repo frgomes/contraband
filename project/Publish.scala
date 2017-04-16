@@ -31,7 +31,7 @@ object BintrayPublish extends AutoPlugin {
   )
 
   override def projectSettings = Seq(
-    BintrayKeys.bintrayRepository := "sbt-plugin-releases",
+    BintrayKeys.bintrayRepository := "sbtsandbox1",
     BintrayKeys.bintrayPackage := "sbt-contraband",
     pomIncludeRepository := { _ => false }
   )
